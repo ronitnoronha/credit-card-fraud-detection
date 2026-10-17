@@ -1,0 +1,15 @@
+feature,value,shap_log_odds,direction
+category,gas_transport,4.8509755,raises risk
+hour,2,2.8985739,raises risk
+amt,11.7,2.3160412,raises risk
+card_prior_txn_count,1793,-1.1663656,lowers risk
+amt_to_card_mean_ratio,0.1692932496474419,0.78249735,raises risk
+card_category_share,0.10875627440044618,0.72557825,raises risk
+amt_zscore_card,-0.23454983834688167,-0.50785136,lowers risk
+city_pop,2836,-0.3716113,lowers risk
+age,34.8,-0.17572133,lowers risk
+is_weekend,0,0.069247596,raises risk
+day_of_week,3,0.066857144,raises risk
+card_txn_count_24h,2,0.05294508,raises risk
+card_txn_count_1h,0,-0.022664431,lowers risk
+secs_since_prev_txn,5478.0,0.0032629631,raises risk

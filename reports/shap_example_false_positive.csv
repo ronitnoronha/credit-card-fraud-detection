@@ -1,0 +1,15 @@
+feature,value,shap_log_odds,direction
+amt,2250.77,4.8942013,raises risk
+hour,21,-1.2795367,lowers risk
+card_prior_txn_count,2198,-0.72823024,lowers risk
+secs_since_prev_txn,12568.0,-0.6221367,lowers risk
+amt_to_card_mean_ratio,36.82876992971614,-0.5053123,lowers risk
+city_pop,509,0.45212892,raises risk
+card_txn_count_24h,7,0.2971113,raises risk
+age,39.9,-0.21489912,lowers risk
+card_txn_count_1h,0,-0.15971902,lowers risk
+amt_zscore_card,14.490163719065313,0.055318594,raises risk
+category,shopping_net,0.046909545,raises risk
+is_weekend,0,0.04148907,raises risk
+card_category_share,0.0718835304822566,-0.025772315,lowers risk
+day_of_week,0,0.015519614,raises risk

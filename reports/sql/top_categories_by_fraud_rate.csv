@@ -1,0 +1,6 @@
+category,n_transactions,n_fraud,fraud_rate_pct,fraud_rate_rank
+shopping_net,139322,2219.0,1.593,1
+misc_net,90654,1182.0,1.304,2
+grocery_pos,176191,2228.0,1.265,3
+shopping_pos,166463,1056.0,0.634,4
+gas_transport,188029,772.0,0.411,5

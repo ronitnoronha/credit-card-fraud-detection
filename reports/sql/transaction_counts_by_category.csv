@@ -1,0 +1,15 @@
+category,n_transactions,share_of_all_pct,avg_amount
+gas_transport,188029,10.15,63.48
+grocery_pos,176191,9.51,116.64
+home,175460,9.47,58.19
+shopping_pos,166463,8.99,78.91
+kids_pets,161727,8.73,57.53
+shopping_net,139322,7.52,86.94
+entertainment,134118,7.24,64.14
+food_dining,130729,7.06,50.99
+personal_care,130085,7.02,48.05
+health_fitness,122553,6.62,54.09
+misc_pos,114229,6.17,62.68
+misc_net,90654,4.89,80.18
+grocery_net,64878,3.5,53.69
+travel,57956,3.13,111.77

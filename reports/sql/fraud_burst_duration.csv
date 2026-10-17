@@ -1,0 +1,2 @@
+n_cards_with_fraud,median_frauds_per_card,median_burst_hours,p90_burst_hours,median_fraud_amount_per_card
+976,10.0,45.0,47.0,5213.32

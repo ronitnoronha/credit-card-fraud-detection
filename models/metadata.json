@@ -1,0 +1,110 @@
+{
+  "features": [
+    "amt",
+    "age",
+    "city_pop",
+    "is_weekend",
+    "card_txn_count_1h",
+    "card_txn_count_24h",
+    "secs_since_prev_txn",
+    "amt_to_card_mean_ratio",
+    "amt_zscore_card",
+    "card_category_share",
+    "card_prior_txn_count",
+    "hour",
+    "day_of_week",
+    "category"
+  ],
+  "tuned_params": {
+    "XGBoost": {
+      "colsample_bytree": 0.6915192661966489,
+      "gamma": 0.38489954914396496,
+      "learning_rate": 0.04383329786942252,
+      "max_depth": 8,
+      "min_child_weight": 2,
+      "n_estimators": 756,
+      "reg_lambda": 0.3901821268272624,
+      "scale_pos_weight": 1.0,
+      "subsample": 0.9485842360750871
+    },
+    "Random Forest": {
+      "n_estimators": 300,
+      "min_samples_leaf": 2,
+      "max_features": "sqrt",
+      "max_depth": 24,
+      "class_weight": null
+    }
+  },
+  "thresholds": {
+    "alert": 0.012193311005830765,
+    "medium": 0.012193311005830765,
+    "high": 0.19233089685440063,
+    "max_f1_reference": 0.32089802622795105,
+    "objective": "max recall s.t. precision >= 0.5 on out-of-fold train predictions",
+    "high_rule": "lowest threshold with precision >= 0.9 on out-of-fold train predictions"
+  },
+  "oof_train_metrics": {
+    "at_0.5": {
+      "accuracy": 0.9988277710297492,
+      "precision": 0.9685347526612398,
+      "recall": 0.8242739142019717,
+      "f1": 0.8906002591046495,
+      "roc_auc": 0.9990102727730248,
+      "pr_auc": 0.9509674084690045,
+      "tn": 1288968,
+      "fp": 201,
+      "fn": 1319,
+      "tp": 6187,
+      "threshold": 0.5
+    },
+    "at_chosen": {
+      "accuracy": 0.9942113482561166,
+      "precision": 0.5,
+      "recall": 0.9664268585131894,
+      "f1": 0.6590351594439902,
+      "roc_auc": 0.9990102727730248,
+      "pr_auc": 0.9509674084690045,
+      "tn": 1281915,
+      "fp": 7254,
+      "fn": 252,
+      "tp": 7254,
+      "threshold": 0.012193311005830765
+    },
+    "fold_pr_auc_mean": 0.9511471921944308,
+    "fold_pr_auc_std": 0.009662211323205105
+  },
+  "test_metrics_xgb_chosen": {
+    "accuracy": 0.996737559809904,
+    "precision": 0.5454048140043763,
+    "recall": 0.9296037296037296,
+    "f1": 0.6874676779865541,
+    "roc_auc": 0.9982829209770866,
+    "pr_auc": 0.9207956051707523,
+    "tn": 551912,
+    "fp": 1662,
+    "fn": 151,
+    "tp": 1994,
+    "threshold": 0.012193311005830765
+  },
+  "test_metrics_xgb_0.5": {
+    "accuracy": 0.9989509086426773,
+    "precision": 0.9768009768009768,
+    "recall": 0.745920745920746,
+    "f1": 0.8458895056833201,
+    "roc_auc": 0.9982829209770866,
+    "pr_auc": 0.9207956051707523,
+    "tn": 553536,
+    "fp": 38,
+    "fn": 545,
+    "tp": 1600,
+    "threshold": 0.5
+  },
+  "train_period": [
+    "2019-01-01 00:00:18",
+    "2020-06-21 12:13:37"
+  ],
+  "test_period": [
+    "2020-06-21 12:14:25",
+    "2020-12-31 23:59:34"
+  ]
+}

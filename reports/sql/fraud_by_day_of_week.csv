@@ -1,0 +1,8 @@
+iso_day_of_week,day_name,n_transactions,n_fraud,fraud_rate_pct
+1,Monday,369418,1484.0,0.402
+2,Tuesday,270340,1266.0,0.468
+3,Wednesday,183913,1125.0,0.612
+4,Thursday,206741,1317.0,0.637
+5,Friday,215078,1376.0,0.64
+6,Saturday,263227,1493.0,0.567
+7,Sunday,343677,1590.0,0.463

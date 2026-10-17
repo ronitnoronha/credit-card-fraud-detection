@@ -1,0 +1,3 @@
+status,n_transactions,avg_amount,median_amount,p90_amount,max_amount
+fraud,9651,530.66,390.0,1024.61,1376.04
+legitimate,1842743,67.65,47.24,134.17,28948.9
