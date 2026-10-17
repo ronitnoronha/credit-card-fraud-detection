@@ -130,8 +130,9 @@ def page_analytics() -> None:
         color=alt.Color("status:N", scale=alt.Scale(domain=["legitimate", "fraud"], range=[LEGIT, FRAUD]), title=None),
         tooltip=["status", "bin_start_usd", "n_transactions", alt.Tooltip("share_within_status:Q", format=".2%")],
     ).properties(height=300), width="stretch")
-    st.caption("Fraud concentrates at roughly $8–25 (small card-testing purchases) and $250–1,100; "
-               "legitimate spend is mostly under $150.")
+    # "\$" stops Streamlit's markdown from treating text between two $ signs as LaTeX.
+    st.caption("Fraud concentrates at roughly \\$8–25 (small card-testing purchases) and \\$250–1,100; "
+               "legitimate spend is mostly under \\$150.")
 
     left, right = st.columns(2)
     with left:
