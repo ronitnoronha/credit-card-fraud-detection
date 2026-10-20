@@ -22,3 +22,6 @@ venv/
 .env
 logs/
 data/processed/
+
+# Personal interview prep (kept local, not published)
+INTERVIEW_NOTES.md

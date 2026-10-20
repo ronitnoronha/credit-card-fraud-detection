@@ -256,5 +256,4 @@ src/run_sql.py, sql/           DuckDB analytics
 src/dashboard_data.py          small artefacts for the app
 app/streamlit_app.py           dashboard
 reports/                       all generated tables, figures and write-ups
-INTERVIEW_NOTES.md             explanations of every decision
 ```
