@@ -1,0 +1,12 @@
+# Dashboard-only dependencies (used by Streamlit Community Cloud, which reads the
+# requirements file next to the app first). Training needs the root requirements.txt.
+# scikit-learn and xgboost are pinned to the versions models/xgb_pipeline.joblib was saved with.
+streamlit>=1.36
+altair>=5
+pandas>=2.2
+numpy>=1.26
+scikit-learn==1.9.1
+xgboost==3.4.1
+shap>=0.45
+matplotlib>=3.8
+joblib>=1.3

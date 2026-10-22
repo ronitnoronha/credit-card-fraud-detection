@@ -176,13 +176,16 @@ card-level aggregation, fraud-burst duration, and a `LAG()` time-since-previous-
 page reads these outputs directly.
 
 ## 14. Streamlit application
-`streamlit run app/streamlit_app.py` opens four pages:
+`streamlit run app/streamlit_app.py` opens five pages:
 1. **Overview**: volume, fraud rate, amounts, headline test metrics.
 2. **Fraud analytics**: category, amount, hour, weekday, monthly and state views.
 3. **Risk predictor**: enter a transaction and card-history summary (or load one of 160 real
    test transactions) to get a probability, risk tier, recommended action and a SHAP waterfall.
    Features are built by the same function used in training (verified: max score difference 3×10⁻⁸).
-4. **Model performance**: test metrics, confusion matrix, PR/ROC curves, CV table, threshold
+4. **Threshold explorer**: drag the decision threshold and see recall, precision, missed frauds,
+   false alarms, alerts per day and fraud dollars stopped/missed update on the test period. At the
+   production threshold the model stops $1.11M of the $1.13M of test-period fraud (97.7%).
+5. **Model performance**: test metrics, confusion matrix, PR/ROC curves, CV table, threshold
    analysis, risk tiers, robustness checks, global SHAP.
 
 ## 15. Limitations
@@ -209,9 +212,14 @@ page reads these outputs directly.
 its thresholds (`models/metadata.json`) are committed, along with the small report/SQL outputs the app
 reads, so the dashboard runs straight after cloning:
 ```bash
-pip install -r requirements.txt
+pip install -r app/requirements.txt     # dashboard-only dependencies
 streamlit run app/streamlit_app.py
 ```
+
+**Deploy online (Streamlit Community Cloud, free):** sign in at [share.streamlit.io](https://share.streamlit.io)
+with GitHub → *Create app* → repository `credit-card-fraud-detection`, branch `main`, main file
+`app/streamlit_app.py` → *Deploy*. Community Cloud installs `app/requirements.txt` (the file next to the app),
+so the training and notebook libraries are not needed.
 `scikit-learn` and `xgboost` are pinned exactly in `requirements.txt` because a pickled model is only
 guaranteed to load with the library versions it was saved with. If you change those versions, retrain
 with `python -m src.train`. Only load `.joblib` files from sources you trust: unpickling can execute code.

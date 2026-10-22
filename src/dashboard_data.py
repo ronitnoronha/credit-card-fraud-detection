@@ -31,12 +31,38 @@ def _history_summary(full: pd.DataFrame, row: pd.Series) -> dict:
     }
 
 
+def threshold_curve(y_true: np.ndarray, proba: np.ndarray, amt: np.ndarray, extra: list[float]) -> pd.DataFrame:
+    """Confusion counts and fraud dollars caught/missed over a log-spaced threshold grid."""
+    grid = np.unique(np.concatenate([np.round(np.logspace(-3, np.log10(0.999), 300), 6), extra]))
+    order = np.argsort(-proba)
+    p_sorted, y_sorted, amt_sorted = proba[order], y_true[order], amt[order]
+    tp_cum = np.concatenate([[0], np.cumsum(y_sorted)])
+    fraud_amt_cum = np.concatenate([[0], np.cumsum(amt_sorted * y_sorted)])
+    # Number of transactions with proba >= t (proba sorted descending).
+    n_flagged = np.searchsorted(-p_sorted, -grid, side="right")
+    tp, fraud_caught = tp_cum[n_flagged], fraud_amt_cum[n_flagged]
+    fp = n_flagged - tp
+    fn = y_true.sum() - tp
+    out = pd.DataFrame({"threshold": grid, "tp": tp, "fp": fp, "fn": fn, "tn": len(y_true) - y_true.sum() - fp,
+                        "fraud_usd_caught": fraud_caught, "fraud_usd_missed": fraud_amt_cum[-1] - fraud_caught})
+    out["precision"] = out["tp"] / (out["tp"] + out["fp"]).replace(0, np.nan)
+    out["recall"] = out["tp"] / y_true.sum()
+    out["f1"] = 2 * out["precision"] * out["recall"] / (out["precision"] + out["recall"])
+    return out
+
+
 def run() -> None:
     thr = load_thresholds()
     model = joblib.load(config.MODELS_DIR / "xgb_pipeline.joblib")
     full = build_feature_table()
     test = full[full["split"] == "test"].copy()
     test["proba"] = model.predict_proba(test[model_features()])[:, 1]
+    config.DASHBOARD_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    curve = threshold_curve(test[config.TARGET].to_numpy(), test["proba"].to_numpy(), test["amt"].to_numpy(),
+                            extra=[thr.medium, thr.high, 0.5])
+    curve.to_csv(config.DASHBOARD_DATA_DIR / "threshold_curve_test.csv", index=False)
+    logger.info("Wrote threshold curve with %d thresholds", len(curve))
+
     flagged = test["proba"] >= thr.medium  # operating (alert) threshold
     y = test[config.TARGET] == 1
     groups = {"caught fraud (TP)": flagged & y, "false alert (FP)": flagged & ~y,

@@ -308,8 +308,88 @@ def page_performance() -> None:
             st.image(str(path), width="stretch")
 
 
+def page_threshold() -> None:
+    st.title("Threshold explorer")
+    st.caption("The model outputs a probability; the threshold decides which transactions get flagged. "
+               "Drag the slider to see the trade-off between catching fraud and bothering genuine customers "
+               "on the held-out test period (Jun–Dec 2020).")
+    curve = read_csv(config.DASHBOARD_DATA_DIR / "threshold_curve_test.csv")
+    summary = read_json(config.REPORTS_DIR / "final_model_summary.json")
+    if curve is None or summary is None:
+        return missing("Threshold curve", "python -m src.dashboard_data")
+
+    chosen = summary["thresholds"]["alert"]
+    high = summary["thresholds"]["high"]
+    start, end = (pd.Timestamp(t) for t in summary["test_period"])
+    days = max((end - start).total_seconds() / 86400, 1)
+    thresholds = curve["threshold"].tolist()
+    default = min(thresholds, key=lambda t: abs(t - chosen))
+
+    t = st.select_slider("Decision threshold (flag if fraud probability ≥ threshold)", options=thresholds,
+                         value=default, format_func=lambda v: f"{v:.4f}")
+    row = curve.loc[curve["threshold"] == t].iloc[0]
+    n_fraud = int(row.tp + row.fn)
+    n_legit = int(row.fp + row.tn)
+
+    c = st.columns(5)
+    c[0].metric("Fraud caught (recall)", f"{row.recall:.1%}", help=f"{int(row.tp):,} of {n_fraud:,} frauds")
+    c[1].metric("Alert precision", f"{row.precision:.1%}" if pd.notna(row.precision) else "–",
+                help="Share of flagged transactions that are real fraud")
+    c[2].metric("Missed frauds", f"{int(row.fn):,}")
+    c[3].metric("False alarms", f"{int(row.fp):,}", help=f"{row.fp / n_legit:.2%} of genuine transactions")
+    c[4].metric("Alerts per day", f"{(row.tp + row.fp) / days:,.1f}", help="Average flagged transactions per day")
+    c = st.columns(3)
+    c[0].metric("Fraud $ stopped", f"${row.fraud_usd_caught:,.0f}")
+    c[1].metric("Fraud $ missed", f"${row.fraud_usd_missed:,.0f}")
+    c[2].metric("Genuine customers flagged", f"{row.fp / n_legit:.2%}")
+
+    rules = pd.DataFrame({"threshold": [t, chosen], "label": ["selected", "production threshold"]})
+    rule = alt.Chart(rules).mark_rule(strokeWidth=1.5).encode(
+        x="threshold:Q",
+        strokeDash=alt.StrokeDash("label:N", scale=alt.Scale(domain=["selected", "production threshold"],
+                                                             range=[[1, 0], [4, 4]]), title=None),
+        color=alt.value(MUTED))
+    x = alt.X("threshold:Q", scale=alt.Scale(type="log"), title="Threshold (log scale)")
+
+    left, right = st.columns(2)
+    with left:
+        st.subheader("Precision, recall and F1")
+        long = curve.melt("threshold", ["precision", "recall", "f1"], var_name="metric", value_name="value")
+        lines = alt.Chart(long).mark_line(strokeWidth=2).encode(
+            x=x, y=alt.Y("value:Q", title=None, axis=alt.Axis(format="%"), scale=alt.Scale(domain=[0, 1])),
+            color=alt.Color("metric:N", scale=alt.Scale(domain=["precision", "recall", "f1"],
+                                                         range=[LEGIT, FRAUD, "#1baf7a"]), title=None),
+            tooltip=[alt.Tooltip("threshold:Q", format=".4f"), "metric", alt.Tooltip("value:Q", format=".1%")])
+        st.altair_chart((lines + rule).properties(height=320), width="stretch")
+    with right:
+        st.subheader("Errors")
+        errs = curve.melt("threshold", ["fp", "fn"], var_name="error", value_name="count")
+        errs["error"] = errs["error"].map({"fp": "false alarms", "fn": "missed frauds"})
+        lines = alt.Chart(errs[errs["count"] > 0]).mark_line(strokeWidth=2).encode(
+            x=x, y=alt.Y("count:Q", scale=alt.Scale(type="log"), title="Count (log scale)"),
+            color=alt.Color("error:N", scale=alt.Scale(domain=["false alarms", "missed frauds"],
+                                                        range=[LEGIT, FRAUD]), title=None),
+            tooltip=[alt.Tooltip("threshold:Q", format=".4f"), "error", alt.Tooltip("count:Q", format=",")])
+        st.altair_chart((lines + rule).properties(height=320), width="stretch")
+
+    st.subheader("Compare with the reference thresholds")
+    refs = {"Selected": t, "Production (precision ≥ 50% rule)": chosen,
+            "High-risk tier (precision ≥ 90%)": high, "Default 0.5": 0.5}
+    table = []
+    for name, val in refs.items():
+        r = curve.iloc[(curve["threshold"] - val).abs().argmin()]
+        table.append({"threshold": name, "value": round(float(r.threshold), 4), "fraud caught": f"{r.recall:.1%}",
+                      "precision": f"{r.precision:.1%}", "missed frauds": int(r.fn), "false alarms": int(r.fp),
+                      "fraud $ missed": f"${r.fraud_usd_missed:,.0f}"})
+    st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
+    st.caption("The production threshold was chosen on training data before the test set was used. "
+               "This page is for exploring the trade-off: picking a threshold by looking at test results "
+               "would be tuning on the test set.")
+
+
 PAGES = {"Overview": page_overview, "Fraud analytics": page_analytics,
-         "Risk predictor": page_predictor, "Model performance": page_performance}
+         "Risk predictor": page_predictor, "Threshold explorer": page_threshold,
+         "Model performance": page_performance}
 
 with st.sidebar:
     st.header("🛡️ Fraud Risk Analytics")
